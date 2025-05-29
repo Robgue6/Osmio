@@ -32,5 +32,5 @@ RUN npm install
 # Expose port
 EXPOSE 8080
 
-# Start the server
-CMD ["npm", "start"] 
+# Start the server with proper shell
+CMD ["/bin/bash", "-c", "cd /app/.wasp/build/server && npm start"] 
