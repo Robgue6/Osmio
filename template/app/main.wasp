@@ -68,7 +68,7 @@ app OpenSaaS {
       // }
     },
     onAuthFailedRedirectTo: "/login",
-    onAuthSucceededRedirectTo: "/demo-app",
+    onAuthSucceededRedirectTo: "/dashboard/delegate",
   },
 
   db: {
@@ -84,13 +84,12 @@ app OpenSaaS {
   },
 
   emailSender: {
-    // NOTE: "Dummy" provider is just for local development purposes.
-    //   Make sure to check the server logs for the email confirmation url (it will not be sent to an address)!
-    //   Once you are ready for production, switch to e.g. "SendGrid" or "Mailgun" providers. Check out https://docs.opensaas.sh/guides/email-sending/ .
-    provider: Dummy,
+    // NOTE: Using SMTP for production deployment
+    // You can also use SendGrid or Mailgun - check https://docs.opensaas.sh/guides/email-sending/
+    provider: SMTP,
     defaultFrom: {
       name: "Open SaaS App",
-      // When using a real provider, e.g. SendGrid, you must use the same email address that you configured your account to send out emails with!
+      // You can use any email address for SMTP
       email: "me@example.com"
     },
   },
@@ -327,3 +326,60 @@ page AdminMessagesPage {
   component: import AdminMessages from "@src/messages/MessagesPage"
 }
 //#endregion
+
+//#region Dashboard
+route DashboardRoute { path: "/dashboard", to: DashboardPage }
+page DashboardPage {
+  authRequired: true,
+  component: import DashboardRedirect from "@src/client/components/dashboard/DashboardRedirect"
+}
+
+route DelegateRoute { path: "/dashboard/delegate", to: DelegatePage }
+page DelegatePage {
+  authRequired: true,
+  component: import DelegatePage from "@src/client/components/dashboard/DelegatePage"
+}
+
+// Souscription delegation routes
+route DelegateSouscriptionAVRoute { path: "/dashboard/delegate/souscription/assurance-vie", to: DelegateFormPage }
+route DelegateSouscriptionPERRoute { path: "/dashboard/delegate/souscription/per", to: DelegateFormPage }
+route DelegateSouscriptionSCPIPPRoute { path: "/dashboard/delegate/souscription/scpi-pp", to: DelegateFormPage }
+route DelegateSouscriptionSCPINPRoute { path: "/dashboard/delegate/souscription/scpi-np", to: DelegateFormPage }
+
+// Actes de gestion routes
+route DelegateActeRIBRoute { path: "/dashboard/delegate/acte/changement-rib", to: DelegateFormPage }
+route DelegateActeBeneficiaireRoute { path: "/dashboard/delegate/acte/clause-beneficiaire", to: DelegateFormPage }
+
+// Generic form handler page
+page DelegateFormPage {
+  authRequired: true,
+  component: import DelegateFormPage from "@src/client/components/dashboard/DelegateFormPage"
+}
+
+route OperationsRoute { path: "/dashboard/operations", to: OperationsPage }
+page OperationsPage {
+  authRequired: true,
+  component: import OperationsPage from "@src/client/components/dashboard/OperationsPage"
+}
+//#endregion
+
+// Operations
+action createDelegationOperation {
+  fn: import { createDelegationOperation } from "@src/operations/actions",
+  entities: [User, DelegationOperation]
+}
+
+action createSeedOperation {
+  fn: import { createSeedOperation } from "@src/operations/actions",
+  entities: [User, DelegationOperation]
+}
+
+action updateDelegationOperationStatus {
+  fn: import { updateDelegationOperationStatus } from "@src/operations/actions",
+  entities: [User, DelegationOperation]
+}
+
+query getUserDelegationOperations {
+  fn: import { getUserDelegationOperations } from "@src/operations/queries",
+  entities: [User, DelegationOperation]
+}
