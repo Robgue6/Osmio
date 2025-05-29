@@ -1,11 +1,18 @@
-FROM node:20-alpine
+FROM node:20-slim
 
-# Install necessary packages
-RUN apk update && apk add --no-cache curl bash
+# Install necessary packages for Ubuntu
+RUN apt-get update && apt-get install -y \
+    curl \
+    bash \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Wasp
 RUN curl -sSL https://get.wasp.sh/installer.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
+
+# Verify Wasp installation
+RUN wasp version
 
 # Set working directory
 WORKDIR /app
