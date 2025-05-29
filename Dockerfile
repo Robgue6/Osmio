@@ -35,8 +35,14 @@ RUN ls -la && cat package.json
 # Install server dependencies
 RUN npm install
 
+# Create the bundle during build time
+RUN npm run bundle
+
+# Verify bundle was created
+RUN ls -la bundle/
+
 # Expose port
 EXPOSE 8080
 
-# Start the server (WORKDIR is already set correctly)
-CMD ["npm", "start"] 
+# Start the server using the bundle-and-start script
+CMD ["npm", "run", "bundle-and-start"] 
