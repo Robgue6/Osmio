@@ -23,8 +23,14 @@ COPY . .
 # Build the Wasp app
 RUN wasp build
 
+# Verify build structure
+RUN ls -la .wasp/build/
+
 # Set working directory to built server
 WORKDIR /app/.wasp/build/server
+
+# Verify server directory contents
+RUN ls -la && cat package.json
 
 # Install server dependencies
 RUN npm install
@@ -32,5 +38,5 @@ RUN npm install
 # Expose port
 EXPOSE 8080
 
-# Start the server with proper shell
-CMD ["/bin/bash", "-c", "cd /app/.wasp/build/server && npm start"] 
+# Start the server (WORKDIR is already set correctly)
+CMD ["npm", "start"] 
